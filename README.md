@@ -18,3 +18,5 @@ A cloud ready app for extreme batch processing using N servers and N threads for
 
 ### Pending Tasks
 1. Currently, all 4 workers are not processing the job, it might be the small data set. Need to try with larger datasets.
+2. It is working with polling mechanism, need to try with aggregating from following example.
+https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples/src/main/java/org/springframework/batch/sample/remotepartitioning/aggregating
