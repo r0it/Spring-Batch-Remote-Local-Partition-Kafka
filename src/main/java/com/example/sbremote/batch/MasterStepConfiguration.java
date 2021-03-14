@@ -73,7 +73,7 @@ public class MasterStepConfiguration {
 				.partitioner("remoteWorkerStep", new RemotePartitioner())
 				.gridSize(partition)
 				.outputChannel(requests())
-//				.partitionHandler(partitionHandler())
+//				.partitionHandler(partitionHandler()) //need to test with partitionhandler
 				.build();
 	}
 
