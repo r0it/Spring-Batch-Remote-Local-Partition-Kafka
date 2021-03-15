@@ -21,7 +21,9 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.kafka.outbound.KafkaProducerMessageHandler;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -86,13 +88,22 @@ public class MasterStepConfiguration {
 	}
 
 	@Bean
-	public IntegrationFlow outboundFlow(KafkaProperties kafkaProperties, KafkaTemplate kafkaTemplate) {
+	public KafkaTemplate kafkaTemplate(KafkaProperties kafkaProperties) {
+		//Need to this to evenly distribute message on all partitions
+		kafkaProperties.getProperties().put("partitioner.class", "com.example.sbremote.batch.partitioner.KafkaPartitioner");
+		log.info(kafkaProperties.buildProducerProperties().toString());
+		return new KafkaTemplate(new DefaultKafkaProducerFactory<>(kafkaProperties.buildProducerProperties()));
+	}
+
+	@Bean
+	public IntegrationFlow outboundFlow(KafkaTemplate kafkaTemplate) {
 		final KafkaProducerMessageHandler kafkaMessageHandler = new KafkaProducerMessageHandler(kafkaTemplate);
 		kafkaMessageHandler.setTopicExpression(new LiteralExpression("migration-topics"));
 		return IntegrationFlows
 				.from(requests())
-//				.handle(Kafka.outboundAdapter(connectionFactory).destination("requests"))
-//				.handle(Kafka.outboundChannelAdapter(kafkaTemplate))
+				.enrichHeaders(h -> h.headerFunction(KafkaHeaders.MESSAGE_KEY,
+						message -> String.valueOf(message.getHeaders().get("sequenceNumber", Integer.class))))
+				.log()
 				.handle(kafkaMessageHandler)
 				.get();
 	}
