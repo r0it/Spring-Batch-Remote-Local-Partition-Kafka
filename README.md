@@ -16,7 +16,9 @@ A cloud ready app for extreme batch processing using N servers and N threads for
 4. Using intelliJ you can run the application parallely by providing different ports in the variables.
 5. just open http://localhost:8080 to start the job.
 
+### Misc
+1. Added Custom KafkaPartitioner to evenly distribute batch partitioning messages to all available partitions.
+
 ### Pending Tasks
-1. Currently, all 4 workers are not processing the job, it might be the small data set. Need to try with larger datasets.
-2. It is working with polling mechanism, need to try with aggregating from following example.
+1. It is working with polling mechanism, need to try with aggregating from following example.
 https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples/src/main/java/org/springframework/batch/sample/remotepartitioning/aggregating
